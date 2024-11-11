@@ -38,4 +38,8 @@ public class Conexion {
         }
         return respuesta;
     }
+
+    public void closeConection(){
+
+    }
 }
