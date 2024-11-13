@@ -4,7 +4,7 @@ import org.example.Conexion;
 
 import java.time.LocalDate;
 
-public class ActualizacionDatos {
+public class Ej2_2 {
 
     public static void subirSalarioDepartamento(int cantidad, String nombreDepartamento, Conexion con) {
         String query="UPDATE empregado INNER JOIN departamento ON empregado.Num_departamento =departamento.Num_departamento " +
@@ -23,7 +23,10 @@ public class ActualizacionDatos {
     }
 
     public static void borrarEmpregadoDeProxecto(String nss, int numProxecto,Conexion con) {
-
+        String query="delete from empregado_proxecto where NSS_empregado = '" + nss +"' and Num_proxecto = "+ numProxecto+" ;";
+        System.out.println(query);
+        int respuesta = con.update(query);
+        System.out.println("Se ha borrado "+ respuesta + " empleado del proyecto");
     }
 
 }

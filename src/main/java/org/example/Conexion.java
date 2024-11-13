@@ -5,7 +5,7 @@ import java.sql.*;
 public class Conexion {
     String url = "jdbc:mysql://localhost:3306/bdempresa";
     String user = "root";
-    String password = "root";
+    String password = "";
     Connection conexion;
 
     public Conexion() {
@@ -20,7 +20,8 @@ public class Conexion {
 
     public ResultSet consulta(String query) {
         ResultSet respuesta;
-        try(Statement st = conexion.createStatement()) {
+        try {
+            Statement st = conexion.createStatement();
             respuesta = st.executeQuery(query);
         } catch (SQLException e) {
             throw new RuntimeException(e);
