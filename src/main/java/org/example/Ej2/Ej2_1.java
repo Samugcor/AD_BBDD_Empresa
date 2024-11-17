@@ -2,34 +2,31 @@ package org.example.Ej2;
 
 import org.example.Conexion;
 
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
+import java.time.LocalDate;
 
 public class Ej2_1 {
-    public static void getDatosEmpleadosByLocalidad(String localidade, Conexion con){
-        String query = "Select e.nombre as 'Nombre', e.apelido_1 as 'Apellido 1', e.apelido_2 as 'Apellido 2', \n" +
-                "e.localidade as 'Localidade', e.salario as 'Salario', e.data_nacimento as 'Fecha nacimiento', \n" +
-                "x.nombre as 'Nombre Jefe', departamento.nome_departamento as 'Nombre Departamento' from empregado e\n" +
-                "left join empregado x on e.NSS_supervisa = x.NSS\n" +
-                "inner join departamento on e.Num_departamento = departamento.Num_departamento \n" +
-                "where e.localidade = \""+localidade+"\";";
 
-        try (ResultSet res = con.consulta(query)){
-            ResultSetMetaData metaData = res.getMetaData();
-            int columnCount = metaData.getColumnCount();
-
-            // Print each row of data
-            while (res.next()) {
-                for (int i = 1; i <= columnCount; i++) {
-                    System.out.println(metaData.getColumnLabel(i) +": "+(res.getString(i) ==null?"-":res.getString(i)) + "\t");
-                }
-                System.out.println();
-            }
-
-            res.getStatement().close();
-        }catch (SQLException e){
-            throw new RuntimeException(e);
-        }
+    public static void subirSalarioDepartamento(int cantidad, String nombreDepartamento, Conexion con) {
+        String query="UPDATE empregado INNER JOIN departamento ON empregado.Num_departamento =departamento.Num_departamento " +
+                "SET salario = salario + " + cantidad +
+                " WHERE departamento.nome_departamento = \""+nombreDepartamento+"\";";
+        System.out.println(query);
+        int respuesta = con.updateSt(query);
+        System.out.println("Se han modificado "+ respuesta + " registros");
     }
+
+    public static void engadirDepartamento(int numero, String nome, String nss,Conexion con) {
+        String query="Insert into departamento values ("+numero+",'"+nome+"','"+nss+"','"+ LocalDate.now() +"')";
+        System.out.println(query);
+        int respuesta = con.updateSt(query);
+        System.out.println("Se ha añadido "+ respuesta + " registros");
+    }
+
+    public static void borrarEmpregadoDeProxecto(String nss, int numProxecto,Conexion con) {
+        String query="delete from empregado_proxecto where NSS_empregado = '" + nss +"' and Num_proxecto = "+ numProxecto+" ;";
+        System.out.println(query);
+        int respuesta = con.updateSt(query);
+        System.out.println("Se ha borrado "+ respuesta + " empleado del proyecto");
+    }
+
 }
