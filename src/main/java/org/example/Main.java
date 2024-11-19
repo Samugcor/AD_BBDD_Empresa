@@ -12,8 +12,8 @@ public class Main {
         //eje2_4();
         //eje2_5();
         //eje3_1();
-        eje3_2();
-
+        //eje3_2();
+        eje3_3();
     }
 
     public static void eje2_1(){
@@ -68,7 +68,12 @@ public class Main {
         //con.mostrarColumnasTabla("BDempresa","empregado");
         //con.mostrarProcedementos();
         con.mostrarClavePrimaria("BDempresa", "empregado");
-        con.mostrarClaveForanea("bdempresa", "departamento");
+        con.mostrarClaveForanea("BDempresa", "empregado_proxecto");
+        con.closeConexion();
+    }
+    public static void eje3_3(){
+        Conexion con = new Conexion();
+        con.mostrarDatosTaboasProcedementos();
         con.closeConexion();
     }
 }

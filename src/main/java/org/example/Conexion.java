@@ -225,6 +225,7 @@ public class Conexion {
                 System.out.println("Tipo: " + tablas.getString("TABLE_TYPE"));
                 System.out.println("----------------------");
             }
+            tablas.close();
         } catch (SQLException e) {
             System.out.println("Erro ao obter as táboas de usuario: " + e.getMessage());
         }
@@ -242,6 +243,7 @@ public class Conexion {
                 System.out.println("Admite valores nulos: " + columnas.getString("IS_NULLABLE"));
                 System.out.println("----------------------");
             }
+            columnas.close();
         } catch (SQLException e) {
             System.out.println("Erro ao obter columnas da táboa: " + e.getMessage());
         }
@@ -258,6 +260,7 @@ public class Conexion {
                 System.out.println("Tipo: " + procedementos.getString("PROCEDURE_TYPE"));
                 System.out.println("----------------------");
             }
+            procedementos.close();
         } catch (SQLException e) {
             System.out.println("Erro ao obter procedementos: " + e.getMessage());
         }
@@ -272,6 +275,7 @@ public class Conexion {
                 System.out.println("Nome da clave: " + pk.getString("PK_NAME"));
                 System.out.println("----------------------");
             }
+            pk.close();
         } catch (SQLException e) {
             System.out.println("Erro ao obter claves primarias: " + e.getMessage());
         }
@@ -281,6 +285,13 @@ public class Conexion {
         try {
             DatabaseMetaData metaData = conexion.getMetaData();
             ResultSet fk = metaData.getImportedKeys(null, esquema, tabla);
+
+            ResultSetMetaData metaDataFK = fk.getMetaData();
+            System.out.println("Columnas no ResultSet:");
+            for (int i = 1; i <= metaDataFK.getColumnCount(); i++) {
+                System.out.println(" - " + metaDataFK.getColumnName(i));
+            }
+
             System.out.println("Claves foráneas da táboa " + tabla + ":");
             while (fk.next()) {
                 System.out.println("Columna de clave foránea: " + fk.getString("FKCOLUMN_NAME"));
@@ -288,11 +299,107 @@ public class Conexion {
                 System.out.println("Columna referenciada: " + fk.getString("PKCOLUMN_NAME"));
                 System.out.println("----------------------");
             }
+            fk.close();
         } catch (SQLException e) {
             System.out.println("Erro ao obter claves foráneas: " + e.getMessage());
         }
     }
 
+    public void mostrarDatosTaboasProcedementos(){
+        try{
+            DatabaseMetaData metaData = conexion.getMetaData();
+            System.out.println("Funcions de cadea: " + metaData.getStringFunctions());
+            System.out.println("Funcions de data e hora: " + metaData.getTimeDateFunctions());
+            System.out.println("Funcions matematicas: " + metaData.getNumericFunctions());
+            System.out.println("Funcions de sistema: " + metaData.getSystemFunctions());
+            System.out.println("Palabras reservadas: " + metaData.getSQLKeywords());
+            System.out.println("Cadea para delimitar identificadores: " + metaData.getIdentifierQuoteString());
+            System.out.println("Cadea escape de caracter comodin: " + metaData.getSearchStringEscape());
+            System.out.println("Usuario pode chamar a todos os procedementos: " + metaData.allProceduresAreCallable());
+            System.out.println("Usuario pode acceder a todas as táboas: " + metaData.allTablesAreSelectable());
+
+        }catch (SQLException e){
+            System.out.println("Erro ao mostrar caracteristicas de funciones e procedementos.");
+            e.printStackTrace();
+        }
+    }
+    public void mostrarLimitesConectador(){
+        try{
+            DatabaseMetaData metaData = conexion.getMetaData();
+            System.out.println("Número máx. de conexiones simultáneas: "+ (metaData.getMaxConnections() == 0? "Sen limite": metaData.getMaxConnections()));
+            System.out.println("Número máx. de sentencias simultáneas: "+ (metaData.getMaxStatements() == 0? "Sen limite": metaData.getMaxStatements()));
+            System.out.println("Número máx. de tablas en una consulta SELECT: "+metaData.getMaxTablesInSelect());
+            System.out.println("Longitud máx. del nombre de una tabla: "+metaData.getMaxTableNameLength());
+            System.out.println("Longitud máx. del nombre de una columna: "+metaData.getMaxColumnNameLength());
+            System.out.println("Longitud máx. del nombre de una sentencia: "+metaData.getMaxStatementLength());
+            System.out.println("Longitud máx. del nombre de una fila: "+metaData.getMaxRowSize());
+            System.out.println("Longitud máx. del nombre de una procedimiento: "+metaData.getMaxProcedureNameLength());
+            System.out.println("Número máx. de columnas que se pueden usar en un ORDER: "+metaData.getMaxColumnsInOrderBy());
+            System.out.println("Número máx. de columnas que se pueden usar en un SELECT: "+metaData.getMaxColumnsInSelect());
+            System.out.println("Número máx. de columnas que se pueden usar en un GROUP BY: "+metaData.getMaxColumnsInGroupBy());
+
+        }catch (SQLException e){
+            System.out.println("Erro ao mostrar os límites do conectador.");
+            e.printStackTrace();
+        }
+    }
+
+    public void mostrarInfoTransacciones(){
+        try{
+            DatabaseMetaData metaData = conexion.getMetaData();
+            System.out.println("Soporta transacciones: "+(metaData.supportsTransactions()?"Sí":"No"));
+            System.out.println("Nivel de aislamiento de las transacciones predeterminado: "+metaData.getDefaultTransactionIsolation());
+            System.out.println("Soporta sentenzas de manipulación de datos e de definición de datos dentro das transaccións: "+metaData.supportsDataDefinitionAndDataManipulationTransactions());
+
+        }catch (SQLException e){
+            System.out.println("Erro ao mostrar información sobre transaccions");
+            e.printStackTrace();
+        }
+    }
+
+    public void mostrarSoporteCaract(){
+        try{
+            DatabaseMetaData metaData = conexion.getMetaData();
+            System.out.println("La instrucción ALTER TABLE se puede utilizar ADD COLUMN y DROP COLUMN: "+metaData.supportsAlterTableWithAddColumn());
+            System.out.println("Los alias de columnas se puede utilizar la palabra AS: "+metaData.supportsColumnAliasing());
+            System.out.println("El resultado de concatenar un valor NULL con uno NOT NULL da como resultado NULL: "+metaData.nullPlusNonNullIsNull());
+            System.out.println("Se soportan las conversiones entre tipos de datos JDBC: "+metaData.supportsConvert());
+            System.out.println("Se soportan los nombres de tablas correlacionadas: "+metaData.supportsTableCorrelationNames());
+            System.out.println("Se permite usar una columna que no esté en la instrucción SELECT en una cláusula ORDER BY: "+metaData.supportsOrderByUnrelated());
+            System.out.println("Se soporta la cláusula GROUP BY: "+metaData.supportsGroupBy());
+            System.out.println("Se permite el uso de una columna que no esté en la instrucción SELECT en una cláusula GROUP BY: "+metaData.supportsGroupByUnrelated());
+            System.out.println("Se soportan las cláusulas LIKE: "+metaData.supportsLikeEscapeClause());
+            System.out.println("Se soportan los outer joins: "+metaData.supportsOuterJoins());
+            System.out.println("Se soportan subconsultas EXISTS: "+metaData.supportsSubqueriesInExists());
+            System.out.println("Se soportan subconsultas en expresiones de comparación IN: "+metaData.supportsSubqueriesInIns());
+            System.out.println("Se soportan subconsultas en expresiones de comparación en expresiones cuantificadas.: "+metaData.supportsSubqueriesInQuantifieds());
+
+        }catch (SQLException e){
+            System.out.println("Erro ao mostrar información sobre o soporte de características");
+            e.printStackTrace();
+        }
+    }
+
+    public void mostrarMetaDatosResultSet(String query){
+        try(Statement st = conexion.createStatement()){
+            ResultSet rs = st.executeQuery(query);
+            ResultSetMetaData metaData = rs.getMetaData();
+            int numColumnas = metaData.getColumnCount();
+
+            System.out.println("\niNFORMACIÓN SOBRE COLUMNAS. TOTAL DE COLUMNAS EN LA CONSULTA: "+numColumnas);
+
+            for (int i = 1; i <= numColumnas; i++){
+                System.out.println("Nome columna: "+metaData.getColumnName(i));
+                System.out.println("Tipo: "+metaData.getColumnTypeName(i));
+                System.out.println("Tamaño: "+metaData.getColumnDisplaySize(i));
+                System.out.println("Pode ser null: "+metaData.isNullable(i));
+            }
+
+        }catch (SQLException e){
+            System.out.println("Erro ao mostrar metadatos do ResultSet");
+            e.printStackTrace();
+        }
+    }
     public void closeConexion() {
         if (conexion != null) {
             try {
